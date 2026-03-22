@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Image,
   Dimensions,
 } from 'react-native';
 
@@ -25,7 +24,6 @@ import Colors from '@/constants/colors';
 import { useGame, GENESIS_LESSONS } from '@/context/GameContext';
 import { LionAvatar } from '@/components/LionAvatar';
 
-const PARCHMENT_BG = require('@/assets/images/parchment_bg.jpg');
 const SCREEN_W = Dimensions.get('window').width;
 
 export default function HomeScreen() {
@@ -63,7 +61,6 @@ export default function HomeScreen() {
         { paddingTop: Math.max(insets.top, Platform.OS === 'web' ? 67 : 0) },
       ]}
     >
-      {/* Header */}
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Shalom!</Text>
@@ -95,7 +92,6 @@ export default function HomeScreen() {
             <LionAvatar stage={userProgress.avatarStage} size={136} />
           </View>
           <Text style={styles.stageName}>{stageName}</Text>
-
           <View style={styles.xpRow}>
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>Lv {userProgress.level}</Text>
@@ -119,21 +115,33 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* ── PARCHMENT — shown in full, sets its own height (square) ── */}
-        <View style={styles.parchmentWrapper}>
-          <Image
-            source={PARCHMENT_BG}
-            style={styles.parchmentImage}
-            resizeMode="contain"
-          />
-          {/* Era title sits over the parchment center */}
-          <View style={styles.parchmentOverlay} pointerEvents="none">
+        {/* Era Card — sem imagem de fundo */}
+        <View style={styles.eraCard}>
+          <View style={styles.eraCardInner}>
+            <View style={styles.eraDecoLine} />
             <Text style={styles.eraTitle}>Jornada de{'\n'}Gênesis</Text>
             <Text style={styles.eraSubtitle}>Era das Origens</Text>
+            <View style={styles.eraDecoLine} />
+          </View>
+          <View style={styles.eraStatsRow}>
+            <View style={styles.eraStat}>
+              <Ionicons name="book-outline" size={18} color={Colors.warm.primary} />
+              <Text style={styles.eraStatText}>{GENESIS_LESSONS.length} lições</Text>
+            </View>
+            <View style={styles.eraStatDivider} />
+            <View style={styles.eraStat}>
+              <Ionicons name="star-outline" size={18} color={Colors.warm.goldDark} />
+              <Text style={styles.eraStatText}>{userProgress.completedLessons.length} completas</Text>
+            </View>
+            <View style={styles.eraStatDivider} />
+            <View style={styles.eraStat}>
+              <Feather name="award" size={18} color="#8B6A3E" />
+              <Text style={styles.eraStatText}>Era I</Text>
+            </View>
           </View>
         </View>
 
-        {/* ── LESSON PATH — below the parchment on cream background ── */}
+        {/* Lesson Path */}
         <View style={styles.pathSection}>
           <View style={styles.pathContainer}>
             {GENESIS_LESSONS.map((lesson, index) => {
@@ -151,7 +159,6 @@ export default function HomeScreen() {
                       ]}
                     />
                   )}
-
                   <View
                     style={[
                       styles.nodeRow,
@@ -180,7 +187,6 @@ export default function HomeScreen() {
                           <Feather name="lock" size={18} color="#8B6A3E" />
                         </View>
                       )}
-
                       <View
                         style={[
                           styles.nodeLabel,
@@ -189,10 +195,7 @@ export default function HomeScreen() {
                       >
                         <View style={[styles.labelPill, isLocked && styles.labelPillLocked]}>
                           <Text
-                            style={[
-                              styles.nodeLabelText,
-                              isLocked && styles.nodeLabelTextLocked,
-                            ]}
+                            style={[styles.nodeLabelText, isLocked && styles.nodeLabelTextLocked]}
                             numberOfLines={2}
                           >
                             {lesson.title}
@@ -206,7 +209,6 @@ export default function HomeScreen() {
             })}
           </View>
 
-          {/* Upcoming Eras */}
           <View style={styles.upcomingEraCards}>
             {['Era da Formação', 'Terra Prometida'].map((era) => (
               <View key={era} style={styles.upcomingEra}>
@@ -223,10 +225,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.warm.bg,
-  },
+  container: { flex: 1, backgroundColor: Colors.warm.bg },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -236,20 +235,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.warm.bg,
     zIndex: 10,
   },
-  greeting: {
-    color: Colors.warm.textMedium,
-    fontSize: 14,
-    fontFamily: 'Inter_500Medium',
-  },
-  username: {
-    color: Colors.warm.textDark,
-    fontSize: 22,
-    fontFamily: 'Inter_700Bold',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 10,
-  },
+  greeting: { color: Colors.warm.textMedium, fontSize: 14, fontFamily: 'Inter_500Medium' },
+  username: { color: Colors.warm.textDark, fontSize: 22, fontFamily: 'Inter_700Bold' },
+  statsContainer: { flexDirection: 'row', gap: 10 },
   statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -260,13 +248,8 @@ const styles = StyleSheet.create({
     gap: 5,
     borderWidth: 1.5,
   },
-  statText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-  },
-  scrollContent: {
-    paddingTop: 4,
-  },
+  statText: { fontFamily: 'Inter_700Bold', fontSize: 14 },
+  scrollContent: { paddingTop: 4 },
   heroCard: {
     marginHorizontal: 20,
     marginTop: 8,
@@ -279,234 +262,77 @@ const styles = StyleSheet.create({
     borderColor: Colors.warm.border,
     ...Platform.select({
       web: { boxShadow: '0 6px 24px rgba(120,60,10,0.12)' } as any,
-      default: {
-        elevation: 6,
-        shadowColor: '#7A3A05',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
+      default: { elevation: 6, shadowColor: '#7A3A05', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 12 },
     }),
   },
   avatarGlow: {
-    width: 156,
-    height: 156,
-    borderRadius: 78,
-    backgroundColor: '#FFF0C8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: Colors.warm.gold,
-    marginBottom: 14,
+    width: 156, height: 156, borderRadius: 78,
+    backgroundColor: '#FFF0C8', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 4, borderColor: Colors.warm.gold, marginBottom: 14,
   },
-  stageName: {
-    fontFamily: 'Cinzel_700Bold',
-    fontSize: 22,
-    color: Colors.warm.textDark,
-    marginBottom: 20,
-  },
-  xpRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
+  stageName: { fontFamily: 'Cinzel_700Bold', fontSize: 22, color: Colors.warm.textDark, marginBottom: 20 },
+  xpRow: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 10 },
   levelBadge: {
-    backgroundColor: Colors.warm.primary,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: '#FFF',
-    flexShrink: 0,
+    backgroundColor: Colors.warm.primary, width: 48, height: 48, borderRadius: 24,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#FFF', flexShrink: 0,
   },
-  levelText: {
-    color: '#FFF',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 13,
-  },
+  levelText: { color: '#FFF', fontFamily: 'Inter_700Bold', fontSize: 13 },
   xpBarBackground: {
-    flex: 1,
-    height: 22,
-    backgroundColor: Colors.warm.xpBg,
-    borderRadius: 11,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: 'rgba(212,160,60,0.4)',
+    flex: 1, height: 22, backgroundColor: Colors.warm.xpBg,
+    borderRadius: 11, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(212,160,60,0.4)',
   },
-  xpBarFill: {
-    height: '100%',
-    backgroundColor: Colors.warm.xpFill,
-    borderRadius: 11,
-  },
-  xpText: {
-    color: Colors.warm.textMedium,
-    fontSize: 12,
-    fontFamily: 'Inter_500Medium',
-    marginTop: 10,
-    textAlign: 'center',
-  },
-  // ── Parchment: natural square image, completely visible ──
-  parchmentWrapper: {
-    marginTop: 24,
-    position: 'relative',
-  },
-  parchmentImage: {
-    width: SCREEN_W,
-    height: SCREEN_W,       // square — full image visible, no cropping
-  },
-  parchmentOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: '15%',   // slightly above center (parchment body starts there)
-  },
-  eraTitle: {
-    fontFamily: 'Cinzel_700Bold',
-    fontSize: 26,
-    color: '#2D1408',
-    textAlign: 'center',
-    lineHeight: 34,
-  },
-  eraSubtitle: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    color: Colors.warm.primaryDark,
-    textAlign: 'center',
-    marginTop: 6,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  // ── Lesson path below parchment ──
-  pathSection: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-  },
-  pathContainer: {
-    alignItems: 'center',
-  },
-  nodeWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  pathLine: {
-    width: 5,
-    height: 32,
-    marginBottom: 6,
-    borderRadius: 3,
-  },
-  pathLineActive: {
-    backgroundColor: Colors.warm.primaryDark,
-  },
-  pathLineLocked: {
-    backgroundColor: 'rgba(139,106,62,0.35)',
-  },
-  nodeRow: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  nodeTouch: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  node: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
+  xpBarFill: { height: '100%', backgroundColor: Colors.warm.xpFill, borderRadius: 11 },
+  xpText: { color: Colors.warm.textMedium, fontSize: 12, fontFamily: 'Inter_500Medium', marginTop: 10, textAlign: 'center' },
+  eraCard: {
+    marginHorizontal: 20, marginTop: 24, borderRadius: 24,
+    backgroundColor: Colors.warm.surface, borderWidth: 2, borderColor: Colors.warm.border, overflow: 'hidden',
     ...Platform.select({
-      web: { boxShadow: '0 4px 14px rgba(120,60,10,0.25)' } as any,
-      default: {
-        elevation: 5,
-        shadowColor: '#5C2A00',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-      },
+      web: { boxShadow: '0 4px 18px rgba(120,60,10,0.10)' } as any,
+      default: { elevation: 4, shadowColor: '#7A3A05', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10 },
     }),
   },
-  completedNode: {
-    backgroundColor: Colors.warm.primary,
-    borderColor: '#FFF',
+  eraCardInner: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 24, gap: 10 },
+  eraDecoLine: { width: 48, height: 2, backgroundColor: Colors.warm.gold, borderRadius: 1, opacity: 0.6 },
+  eraTitle: { fontFamily: 'Cinzel_700Bold', fontSize: 26, color: Colors.warm.textDark, textAlign: 'center', lineHeight: 34 },
+  eraSubtitle: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.warm.primaryDark, textAlign: 'center', letterSpacing: 2, textTransform: 'uppercase' },
+  eraStatsRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.warm.surfaceWarm, borderTopWidth: 1.5, borderTopColor: Colors.warm.border,
+    paddingVertical: 14, paddingHorizontal: 20,
   },
-  currentNode: {
-    backgroundColor: Colors.warm.primaryLight,
-    borderColor: '#FFF',
-    width: 78,
-    height: 78,
-    borderRadius: 39,
+  eraStat: { flex: 1, alignItems: 'center', gap: 5 },
+  eraStatText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.warm.textMedium },
+  eraStatDivider: { width: 1, height: 28, backgroundColor: Colors.warm.border },
+  pathSection: { paddingHorizontal: 24, paddingTop: 24 },
+  pathContainer: { alignItems: 'center' },
+  nodeWrapper: { width: '100%', alignItems: 'center', marginBottom: 10 },
+  pathLine: { width: 5, height: 32, marginBottom: 6, borderRadius: 3 },
+  pathLineActive: { backgroundColor: Colors.warm.primaryDark },
+  pathLineLocked: { backgroundColor: 'rgba(139,106,62,0.35)' },
+  nodeRow: { width: '100%', alignItems: 'center' },
+  nodeTouch: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  node: {
+    width: 68, height: 68, borderRadius: 34, alignItems: 'center', justifyContent: 'center', borderWidth: 4,
+    ...Platform.select({
+      web: { boxShadow: '0 4px 14px rgba(120,60,10,0.25)' } as any,
+      default: { elevation: 5, shadowColor: '#5C2A00', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8 },
+    }),
   },
-  lockedNode: {
-    backgroundColor: 'rgba(220,195,155,0.9)',
-    borderColor: 'rgba(139,106,62,0.45)',
-  },
-  nodeLabel: {
-    position: 'absolute',
-    width: 128,
-  },
-  nodeLabelLeft: {
-    right: 84,
-    alignItems: 'flex-end',
-  },
-  nodeLabelRight: {
-    left: 84,
-    alignItems: 'flex-start',
-  },
-  labelPill: {
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(212,160,60,0.4)',
-  },
-  labelPillLocked: {
-    backgroundColor: 'rgba(220,195,155,0.6)',
-    borderColor: 'rgba(139,106,62,0.25)',
-  },
-  nodeLabelText: {
-    color: '#2D1408',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  nodeLabelTextLocked: {
-    color: '#8B6A3E',
-  },
-  upcomingEraCards: {
-    marginTop: 36,
-    gap: 14,
-    paddingBottom: 8,
-  },
+  completedNode: { backgroundColor: Colors.warm.primary, borderColor: '#FFF' },
+  currentNode: { backgroundColor: Colors.warm.primaryLight, borderColor: '#FFF', width: 78, height: 78, borderRadius: 39 },
+  lockedNode: { backgroundColor: 'rgba(220,195,155,0.9)', borderColor: 'rgba(139,106,62,0.45)' },
+  nodeLabel: { position: 'absolute', width: 128 },
+  nodeLabelLeft: { right: 84, alignItems: 'flex-end' },
+  nodeLabelRight: { left: 84, alignItems: 'flex-start' },
+  labelPill: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(212,160,60,0.4)' },
+  labelPillLocked: { backgroundColor: 'rgba(220,195,155,0.6)', borderColor: 'rgba(139,106,62,0.25)' },
+  nodeLabelText: { color: '#2D1408', fontFamily: 'Inter_700Bold', fontSize: 12, textAlign: 'center' },
+  nodeLabelTextLocked: { color: '#8B6A3E' },
+  upcomingEraCards: { marginTop: 36, gap: 14, paddingBottom: 8 },
   upcomingEra: {
-    alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    backgroundColor: Colors.warm.surfaceWarm,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: Colors.warm.border,
+    alignItems: 'center', paddingVertical: 18, paddingHorizontal: 20,
+    backgroundColor: Colors.warm.surfaceWarm, borderRadius: 18, borderWidth: 2, borderColor: Colors.warm.border,
   },
-  upcomingEraTitle: {
-    fontFamily: 'Cinzel_700Bold',
-    fontSize: 18,
-    color: Colors.warm.lockedText,
-    marginTop: 10,
-  },
-  upcomingEraSubtitle: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-    color: Colors.warm.textLight,
-    marginTop: 3,
-  },
+  upcomingEraTitle: { fontFamily: 'Cinzel_700Bold', fontSize: 18, color: Colors.warm.lockedText, marginTop: 10 },
+  upcomingEraSubtitle: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.warm.textLight, marginTop: 3 },
 });
